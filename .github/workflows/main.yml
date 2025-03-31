@@ -45,7 +45,7 @@ jobs:
         if: ${{ github.event.inputs.kernelsu_variant == 'SukiSU' }}
         run: |
           cd kernel_workspace/kernel_platform
-          curl -LSs "https://raw.githubusercontent.com/ShirkNeko/KernelSU/main/kernel/setup.sh" | susfs-dev
+         curl -LSs "https://raw.githubusercontent.com/ShirkNeko/KernelSU/main/kernel/setup.sh" | bash -s susfs-dev
 
       - name: Apply SUSFS Patches MKSU-SKN
         if: ${{ (inputs.kernelsu_variant == 'KSU_Next') && github.event.inputs.SUSFS_ENABLED == 'true' }}
