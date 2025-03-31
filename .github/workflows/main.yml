@@ -210,7 +210,7 @@ jobs:
 
           # Run sed commands for modifications
           sed -i 's/check_defconfig//' ./build.config.gki
-          sed -i '$s|echo "\$res"|echo "\$res-Cabage"|' ./scripts/setlocalversion
+          sed -i '$s|echo "\$res"|echo "\-Kim.Jongun"|' ./scripts/setlocalversion
           sed -i 's/-dirty//' ./scripts/setlocalversion
 
 
