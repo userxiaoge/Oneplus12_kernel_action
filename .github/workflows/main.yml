@@ -166,4 +166,5 @@ jobs:
         with:
          name: Image_KernelSU_suki
          path: kernel_workspace/kernel_platform/out/arch/arm64/boot/Image
-      if: always()
+        # Add a condition to prevent running if essential variables are missing
+        if: always()
