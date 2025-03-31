@@ -114,21 +114,21 @@ jobs:
           sed -i "s/DKSU_VERSION=11998/DKSU_VERSION=${KSU_VERSION}/" kernel/Makefile
 
       - name: Apply SUSFS Patches MKSU-SKN
-        if: ${{ (inputs.kernelsu_variant == 'KSU_Next') && github.event.inputs.SUSFS_ENABLED == 'true' }}
-        run: |
-          cd kernel_workspace
-          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-${{ github.event.inputs.ANDROID_VERSION }}-${{ github.event.inputs.KERNEL_VERSION }}
-          clone https://github.com/ShirkNeko/SukiSU_patch.git 
-          cd kernel_platform
+  if: ${{ (inputs.kernelsu_variant == 'KSU_Next') && github.event.inputs.SUSFS_ENABLED == 'true' }}
+  run: |
+    cd kernel_workspace
+    git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-${{ github.event.inputs.ANDROID_VERSION }}-${{ github.event.inputs.KERNEL_VERSION }}
+    git clone https://github.com/ShirkNeko/SukiSU_patch.git 
+    cd kernel_platform
 
-          # Copy SUSFS patches
-          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ github.event.inputs.ANDROID_VERSION }}-${{ github.event.inputs.KERNEL_VERSION }}.patch ./
-          cp ../susfs4ksu/kernel_patches/fs/* ./fs/
-          cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
+    # Copy SUSFS patches
+    cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ github.event.inputs.ANDROID_VERSION }}-${{ github.event.inputs.KERNEL_VERSION }}.patch .
+    cp ../susfs4ksu/kernel_patches/fs/* ./fs/
+    cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
-          echo "正在给内核打susfs补丁"
-          patch -p1 < 50_add_susfs_in_gki-${{ github.event.inputs.ANDROID_VERSION }}-${{ github.event.inputs.KERNEL_VERSION }}.patch || true
-          echo "完成"
+    echo "正在给内核打susfs补丁"
+    patch -p1 < 50_add_susfs_in_gki-${{ github.event.inputs.ANDROID_VERSION }}-${{ github.event.inputs.KERNEL_VERSION }}.patch || echo "Warning: SUSFS patch failed"
+    echo "完成"
 
       - name: Apply Hide Stuff Patches
         if: ${{ github.event.inputs.SUSFS_ENABLED == 'true' }}
@@ -139,21 +139,19 @@ jobs:
           patch -p1 -F 3 < 69_hide_stuff.patch
          
       - name: Apply New Hooks Patches
-        if: ${{ github.event.inputs.VFS_patch_ENABLED == 'enable' }}
-        run: |
-          cd kernel_workspace/kernel_platform/
-          cp ../SukiSU_patch/hooks/new_hooks.patch ./
-          echo "正在打vfs补丁"
-          patch -p1 -F 3 < new_hooks.patch
-          echo "完成"
+  if: ${{ github.event.inputs.VFS_patch_ENABLED == 'enable' }}
+  run: |
+    cd kernel_workspace/kernel_platform
+    cp ../SukiSU_patch/hooks/new_hooks.patch ./
+    echo "正在打vfs补丁"
+    patch -p1 -F 3 < new_hooks.patch || echo "Warning: VFS patch failed"
+    echo "完成"
 
-          cp -r ../SukiSU_patch/other/lz4k/include/linux/* ./include/linux
-          cp -r ../SukiSU_patch/other/lz4k/lib/* ./lib
-          cp -r ../SukiSU_patchcd /other/lz4k/crypto/* ./crypto
-          cp ../SukiSU_patch/other/lz4k_patch/6.1/lz4kd.patch
-          patch -p1 -F 3 < lz4kd.patch || true
-          #  patch -p1 -F 3 < lz4kd.patch || true
-          #fi
+    cp -r ../SukiSU_patch/other/lz4k/include/linux/* ./include/linux
+    cp -r ../SukiSU_patch/other/lz4k/lib/* ./lib
+    cp -r ../SukiSU_patch/other/lz4k/crypto/* ./crypto
+    cp ../SukiSU_patch/other/lz4k_patch/6.1/lz4kd.patch .
+    patch -p1 -F 3 < lz4kd.patch || echo "Warning: LZ4KD patch failed"
       
 
       - name: Add SUSFS Configuration Settings
