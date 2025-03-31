@@ -45,7 +45,7 @@ jobs:
         if: ${{ github.event.inputs.kernelsu_variant == 'SukiSU' }}
         run: |
           cd kernel_workspace/kernel_platform
-         curl -LSs "https://raw.githubusercontent.com/ShirkNeko/KernelSU/main/kernel/setup.sh" | bash -s susfs-dev
+          curl -LSs "https://raw.githubusercontent.com/ShirkNeko/KernelSU/main/kernel/setup.sh" | bash -s susfs-dev
 
       - name: Apply SUSFS Patches MKSU-SKN
         if: ${{ (inputs.kernelsu_variant == 'KSU_Next') && github.event.inputs.SUSFS_ENABLED == 'true' }}
@@ -160,43 +160,6 @@ jobs:
         id: timestamp
         run: echo "CURRENT_TIMESTAMP=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_ENV
 
-      - name: Prepare and Package AnyKernel3 (Image Only)
-        run: |
-          # --- Clone AnyKernel3 ---
-          echo "Cloning AnyKernel3..."
-          git clone https://github.com/cabagekiller/AnyKernel3.git -b gki-2.0 --depth=1 AnyKernel3
-          rm -rf AnyKernel3/.git
-
-          # --- Copy Kernel Image ---
-          echo "Copying kernel Image..."
-          cp kernel_workspace/kernel_platform/out/arch/arm64/boot/Image AnyKernel3/
-          # Optional: cp kernel_workspace/kernel_platform/out/arch/arm64/boot/Image ./kernel_workspace/kernel
-
-          # --- Skip Module Handling ---
-          echo "Skipping kernel module copy and cleanup..."
-
-          # --- Set up Zip Name ---
-          ZIP_FILENAME="AnyKernel3-ImageOnly_${KSUVER}_${CONFIG_NAME:-default}_pineapple_${CURRENT_TIMESTAMP}.zip" # Adjusted name
-          echo "ZIP_FILENAME=${ZIP_FILENAME}" >> $GITHUB_ENV
-          echo "Final zip name will be: ${ZIP_FILENAME}"
-
-          # --- Create the Zip File ---
-          echo "Creating zip file: ${ZIP_FILENAME}..."
-          cd AnyKernel3
-          # Zip contents, excluding the base 'modules' directory just in case
-          zip -r9 "../${ZIP_FILENAME}" * -x ".git*" -x "LICENSE" -x "README.md" -x "*.zip" -x modules
-          cd ..
-          echo "Zip file created."
-
-          # --- Verify Zip Contents ---
-          echo "Listing contents of ${ZIP_FILENAME}..."
-          unzip -l "${ZIP_FILENAME}" | grep Image || echo "::warning::Could not verify Image in zip listing."
-
-        env:
-          KSUVER: ${{ env.KSUVER }}
-          CURRENT_TIMESTAMP: ${{ env.CURRENT_TIMESTAMP }}
-          # CONFIG_NAME: default # Example if needed
-        working-directory: ${{ github.workspace }}
 
       - name: Upload Image
         uses: actions/upload-artifact@v4
