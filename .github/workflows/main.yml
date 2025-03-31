@@ -160,65 +160,11 @@ jobs:
         id: timestamp
         run: echo "CURRENT_TIMESTAMP=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_ENV
 
-      - name: Prepare and Package AnyKernel3 (Image Only)
-        run: |
-          # --- Clone AnyKernel3 ---
-          echo "Cloning AnyKernel3..."
-          git clone https://github.com/cabagekiller/AnyKernel3.git -b gki-2.0 --depth=1 AnyKernel3
-          rm -rf AnyKernel3/.git
 
-          # --- Copy Kernel Image ---
-          echo "Copying kernel Image..."
-          cp kernel_workspace/kernel_platform/out/arch/arm64/boot/Image AnyKernel3/
-          # Optional: cp kernel_workspace/kernel_platform/out/arch/arm64/boot/Image ./kernel_workspace/kernel
-
-          # --- Skip Module Handling ---
-          echo "Skipping kernel module copy and cleanup..."
-
-          # --- Set up Zip Name ---
-          ZIP_FILENAME="AnyKernel3-ImageOnly_${KSUVER}_${CONFIG_NAME:-default}_pineapple_${CURRENT_TIMESTAMP}.zip" # Adjusted name
-          echo "ZIP_FILENAME=${ZIP_FILENAME}" >> $GITHUB_ENV
-          echo "Final zip name will be: ${ZIP_FILENAME}"
-
-          # --- Create the Zip File ---
-          echo "Creating zip file: ${ZIP_FILENAME}..."
-          cd AnyKernel3
-          # Zip contents, excluding the base 'modules' directory just in case
-          zip -r9 "../${ZIP_FILENAME}" * -x ".git*" -x "LICENSE" -x "README.md" -x "*.zip" -x modules
-          cd ..
-          echo "Zip file created."
-
-          # --- Verify Zip Contents ---
-          echo "Listing contents of ${ZIP_FILENAME}..."
-          unzip -l "${ZIP_FILENAME}" | grep Image || echo "::warning::Could not verify Image in zip listing."
-
-        env:
-          KSUVER: ${{ env.KSUVER }}
-          CURRENT_TIMESTAMP: ${{ env.CURRENT_TIMESTAMP }}
-          # CONFIG_NAME: default # Example if needed
-        working-directory: ${{ github.workspace }}
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Pass other variables needed ONLY for the 'name' or 'body' if not set via $GITHUB_ENV earlier
-          # Example: ROOT_DIR_PREFIX: ${{ env.ROOT_DIR_PREFIX }}
+      - name: Upload Image
+        uses: actions/upload-artifact@v4
         with:
-          # Use the correct variable set by the previous step. Assumes file is in workspace root.
-          files: ${{ env.ZIP_FILENAME }}
-          # Ensure CURRENT_TIMESTAMP was set via $GITHUB_ENV in an earlier step
-          tag_name: release-${{ env.CURRENT_TIMESTAMP }}
-          # Use the correct ZIP_FILENAME in the release name too
-          name: Release ${{ env.ROOT_DIR_PREFIX }} ${{ env.ZIP_FILENAME }} # Make sure ROOT_DIR_PREFIX is set earlier too
-          body: |
-            Release for ${{ env.ROOT_DIR_PREFIX }} based on branch ${{ github.event.inputs.CPU }}.
-            KSU Version: ${{ env.KSUVER }} # Ensure KSUVER is set earlier
-            Timestamp: ${{ env.CURRENT_TIMESTAMP }}
-            Config: ${{ github.event.inputs.FEIL }} # Ensure FEIL is a valid input name
-            Device: ${{ github.event.inputs.CPUD }}
-          draft: false
-          prerelease: false
-        # Add a condition to prevent running if essential variables are missing
+         name: Image_KernelSU_suki
+         path: kernel_workspace/kernel_platform/out/arch/arm64/boot/Image
+         
         if: always()
