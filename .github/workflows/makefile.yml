@@ -133,27 +133,27 @@ jobs:
       - name: Apply Hide Stuff Patches
         if: ${{ github.event.inputs.SUSFS_ENABLED == 'true' }}
         run: |
-          cd kernel_workspace/kernel_platform
+          cd kernel_workspace/kernel_platform/
           cp ../SukiSU_patch/69_hide_stuff.patch ./
           echo "正在打隐藏应用补丁"
-          patch -p1 -F 3 < 69_hide_stuff.patch || true
+          patch -p1 -F 3 < 69_hide_stuff.patch
+         
       - name: Apply New Hooks Patches
         if: ${{ github.event.inputs.VFS_patch_ENABLED == 'enable' }}
         run: |
-          cd kernel_workspace/kernel_platform
-          #cp ../kernel_patches/next/next_hooks.patch ./
-          cp ../SukiSU_patch/next/syscall64_hooks.patch ./
+          cd kernel_workspace/kernel_platform/
+          cp ../SukiSU_patch/hooks/new_hooks.patch ./
           echo "正在打vfs补丁"
-          patch -p1 -F 3 < syscall64_hooks.patch || true
-          #patch -p1 -F 3 < next_hooks.patch || true
+          patch -p1 -F 3 < new_hooks.patch
           echo "完成"
 
-      # zram lz4kd
           cp -r ../SukiSU_patch/other/lz4k/include/linux/* ./include/linux
           cp -r ../SukiSU_patch/other/lz4k/lib/* ./lib
           cp -r ../SukiSU_patchcd /other/lz4k/crypto/* ./crypto
           cp ../SukiSU_patch/other/lz4k_patch/6.1/lz4kd.patch
           patch -p1 -F 3 < lz4kd.patch || true
+          #  patch -p1 -F 3 < lz4kd.patch || true
+          #fi
       
 
       - name: Add SUSFS Configuration Settings
