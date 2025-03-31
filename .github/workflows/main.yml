@@ -124,10 +124,10 @@ jobs:
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
           # zram lz4kd
-          # cp -r ../SukiSU_patch/other/lz4k/include/linux/* ./include/linux
-          #cp -r ../SukiSU_patch/other/lz4k/lib/* ./lib
-          #cp -r ../SukiSU_patch/other/lz4k/crypto/* ./crypto
-          #cp ../SukiSU_patch/other/lz4k_patch/6.1/lz4kd.patch ./
+          cp -r ../SukiSU_patch/other/lz4k/include/linux/* ./include/linux
+          cp -r ../SukiSU_patch/other/lz4k/lib/* ./lib
+          cp -r ../SukiSU_patch/other/lz4k/crypto/* ./crypto
+          cp ../SukiSU_patch/other/lz4k_patch/6.1/lz4kd.patch ./
 
           echo "正在给内核打susfs补丁"
           patch -p1 < 50_add_susfs_in_gki-${{ github.event.inputs.ANDROID_VERSION }}-${{ github.event.inputs.KERNEL_VERSION }}.patch || true
@@ -160,13 +160,17 @@ jobs:
 
           # Add SUSFS configuration settings
           echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/gki_defconfig
+          echo 
+          > ./arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU=y" >> ./arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> ./arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> ./arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> ./arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y" >> ./arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y" >> ./arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> ./arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=n" >> ./arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=y" >> ./arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_TRY_UMOUNT=y" >> ./arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y" >> ./arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> ./arch/arm64/configs/gki_defconfig
@@ -174,11 +178,15 @@ jobs:
           echo "CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y" >> ./arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> ./arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> ./arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> ./arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_WITH_KPROBES=n" >> ./arch/arm64/configs/gki_defconfig
+          echo "CONFIG_COMPAT=y" >> ./arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_VFS=y" >> ./arch/arm64/configs/gki_defconfig
           # Add zram
-          #echo "CONFIG_CRYPTO_LZ4K=y" >> ./arch/arm64/configs/gki_defconfig
-          #echo "CONFIG_CRYPTO_LZ4KD=y" >> ./arch/arm64/configs/gki_defconfig
-          #echo "CONFIG_CRYPTO_LZ4HC=y" >> ./arch/arm64/configs/gki_defconfig
-          #echo "CONFIG_CRYPTO_842=y" >> ./arch/arm64/configs/gki_defconfig
+          echo "CONFIG_CRYPTO_LZ4K=y" >> ./arch/arm64/configs/gki_defconfig
+          echo "CONFIG_CRYPTO_LZ4KD=y" >> ./arch/arm64/configs/gki_defconfig
+          echo "CONFIG_CRYPTO_LZ4HC=y" >> ./arch/arm64/configs/gki_defconfig
+          echo "CONFIG_CRYPTO_842=y" >> ./arch/arm64/configs/gki_defconfig
           # Add additional tmpfs config setting
           echo "CONFIG_TMPFS_XATTR=y" >> ./arch/arm64/configs/gki_defconfig
           #echo "CONFIG_TMPFS_POSIX_ACL=y" >> ./arch/arm64/configs/gki_defconfig
