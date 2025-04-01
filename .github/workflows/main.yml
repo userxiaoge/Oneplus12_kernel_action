@@ -217,7 +217,7 @@ jobs:
           # --- Copy Kernel Image ---
           echo "Copying kernel Image..."
           cp kernel_workspace/kernel_platform/out/arch/arm64/boot/Image AnyKernel3/
-           Optional: cp kernel_workspace/kernel_platform/out/arch/arm64/boot/Image ./kernel_workspace/kernel
+          cp kernel_workspace/kernel_platform/out/arch/arm64/boot/Image ./kernel_workspace/kernel
           # --- Skip Module Handling ---
           echo "Skipping kernel module copy and cleanup..."
           # --- Set up Zip Name ---
